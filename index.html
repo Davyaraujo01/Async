@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo de Dados com Async/Await</title>
+    <!-- Carrega o Tailwind CSS via CDN para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter como padrão */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white shadow-xl rounded-xl p-8 space-y-6 border border-gray-100">
+        <h1 class="text-3xl font-bold text-gray-800 text-center">Consulta de Dados do Usuário</h1>
+        <p class="text-gray-500 text-center">Clique no botão abaixo para simular uma requisição de dados em formato JSON.</p>
+
+        <!-- Seção do Formulário (apenas o botão de ação) -->
+        <div class="flex flex-col items-center space-y-4">
+            <button id="fetchButton" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                Buscar Dados do Usuário
+            </button>
+            <p id="loadingMessage" class="hidden text-sm text-indigo-500 font-medium">Carregando dados, aguarde...</p>
+        </div>
+
+        <!-- Área de Exibição dos Dados -->
+        <div id="userDataDisplay" class="mt-6 p-5 bg-gray-50 border border-gray-200 rounded-lg hidden">
+            <h2 class="text-xl font-semibold mb-3 text-gray-700 border-b pb-2">Detalhes do Usuário</h2>
+            <dl class="space-y-2">
+                <div class="flex justify-between">
+                    <dt class="font-medium text-gray-600">Nome:</dt>
+                    <dd id="display-nome" class="text-gray-800"></dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="font-medium text-gray-600">Endereço:</dt>
+                    <dd id="display-endereco" class="text-gray-800 text-right"></dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="font-medium text-gray-600">Telefone:</dt>
+                    <dd id="display-telefone" class="text-gray-800"></dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="font-medium text-gray-600">E-mail:</dt>
+                    <dd id="display-email" class="text-gray-800 text-right"></dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Bloco JavaScript: Lógica de Consumo de Dados -->
+    <script>
+        // 1. Definição do Dicionário de Dados (JSON simulado)
+        // Este objeto simula os dados que seriam retornados por uma API real em formato JSON.
+        const mockUserData = {
+            nome: "Joana Ferreira",
+            endereco: "Avenida Principal, 404, Bloco C",
+            telefone: "+55 (11) 98765-4321",
+            email: "joana.ferreira@exemplo.com.br"
+        };
+
+        // 2. Referências aos Elementos HTML
+        // Captura os elementos que serão manipulados no DOM.
+        const fetchButton = document.getElementById('fetchButton');
+        const userDataDisplay = document.getElementById('userDataDisplay');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        // 3. Função Assíncrona para Simular a Chamada de API
+        // A palavra-chave 'async' define que esta função retornará uma Promise.
+        // Isso permite o uso da palavra-chave 'await' dentro dela.
+        const fetchUserData = async () => {
+            // 4. Mostrar Indicador de Carregamento e Desabilitar Botão
+            loadingMessage.classList.remove('hidden');
+            userDataDisplay.classList.add('hidden');
+            fetchButton.disabled = true;
+            fetchButton.textContent = 'Buscando...';
+            
+            // 5. Bloco try/catch para tratamento de erros
+            // É uma boa prática usar try/catch em funções assíncronas para capturar rejeições (erros) da Promise.
+            try {
+                // 6. Simulação de Atraso de Rede com Promise
+                // 'await' pausa a execução da função 'fetchUserData' até que a Promise (aqui, a simulação
+                // de 2 segundos de atraso) seja resolvida.
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // 7. Simulação de Resposta da API
+                // Se a requisição fosse real, usaríamos o 'fetch()' nativo aqui:
+                // const response = await fetch('url-da-sua-api');
+                // const data = await response.json();
+                
+                // No nosso exemplo, a 'data' é o nosso objeto simulado.
+                const data = mockUserData;
+                
+                // 8. Exibição dos Dados no HTML
+                // Se a Promise for resolvida com sucesso (o atraso termina), os dados são exibidos.
+                document.getElementById('display-nome').textContent = data.nome;
+                document.getElementById('display-endereco').textContent = data.endereco;
+                document.getElementById('display-telefone').textContent = data.telefone;
+                document.getElementById('display-email').textContent = data.email;
+                
+                // 9. Mostrar a Área de Dados
+                userDataDisplay.classList.remove('hidden');
+
+            } catch (error) {
+                // 10. Tratamento de Erro
+                // Se ocorrer um erro durante a execução (ex: falha de rede ou Promise rejeitada),
+                // o erro é capturado aqui.
+                console.error("Erro ao buscar dados:", error);
+                alert("Ocorreu um erro ao buscar os dados. Verifique o console.");
+
+            } finally {
+                // 11. Finalização (Executado sempre, com ou sem erro)
+                // Restaura o estado inicial da interface.
+                loadingMessage.classList.add('hidden');
+                fetchButton.disabled = false;
+                fetchButton.textContent = 'Buscar Dados do Usuário';
+            }
+        };
+
+        // 12. Adiciona o Event Listener
+        // Associa a função assíncrona 'fetchUserData' ao evento de clique do botão.
+        fetchButton.addEventListener('click', fetchUserData);
+    </script>
+
+</body>
+</html>
